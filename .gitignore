@@ -1,0 +1,18 @@
+# Compiled executables
+.exe
+.out
+
+# Object Files
+.o
+.obj
+
+# Build directories
+build/
+bin/
+
+# VS code
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
