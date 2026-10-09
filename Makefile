@@ -1,13 +1,13 @@
 CXX = g++
-SOURCE = main.cpp
-TARGET = $(basename $(SOURCE)).exe
+SOURCE = main.cpp Player/Player.cpp
+TARGET = $(basename $(firstword $(SOURCE))).exe
 FLAGS = -Iinclude -Llib -lraylib -lgdi32 -lwinmm -lopengl32
 
 $(TARGET): $(SOURCE)
-	$(CXX) -o $@ $< $(FLAGS)
+	$(CXX) -o $@ $^ $(FLAGS)
 
 clean:
-	rm $(TARGET)
+	rm -f $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)

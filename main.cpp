@@ -2,6 +2,7 @@
 #include<raylib.h>
 #include<vector>
 #include<cmath>
+#include "Player/Player.h"
 
 const int screenWidth = 1600;
 const int screenHeight = 900;
@@ -41,8 +42,8 @@ class Arena {
             Vector2 borderDim = getBorderDimensions(screenDim);
             
 
-            Vector2 wallDimH = {(borderDim.x / 4), border.x};
-            Vector2 wallDimV = {border.y, (borderDim.y / 4)};
+            Vector2 wallDimH = {(borderDim.x / 4), (float)border.x};
+            Vector2 wallDimV = {(float)border.y, (borderDim.y / 4)};
 
             //BOTTOM LEFT QUADRANT HORIZONTAL
             walls[0].rect.x = (borderDim.x / 4) + border.x;
@@ -100,101 +101,6 @@ class Arena {
         }
 };
 
-typedef struct Triangle {
-    Vector2 v1;
-    Vector2 v2;
-    Vector2 v3;
-    Vector2 center;
-    int offset = 20;
-    int height = 30;
-}Triangle;
-
-
-Vector2 rotatePoint(Vector2 vertex, Vector2 playerCenter, int turnAngle) {
-    float radians = turnAngle * DEG2RAD;
-
-    float x = vertex.x - playerCenter.x;
-    float y = vertex.y - playerCenter.y;
-
-    float rotatedX = x * cos(radians) - y * sin(radians);
-    float rotatedY = x * sin(radians) + y * cos(radians);
-
-    return {rotatedX + playerCenter.x,
-            rotatedY + playerCenter.y};
-}
-
-Vector2 getDirection(int turnAngle) {
-    return {(float) sin(turnAngle * DEG2RAD), 
-            (float) -cos(turnAngle * DEG2RAD)};
-}
-
-class Player {
-    public:
-        int speed = 5;
-        int angleSpeed = 5;
-        int turnAngle = 0;
-        Vector2 velocity = {0, 0};
-        Rectangle hitbox = {0, 0, 0, 0};
-        Triangle playerShape;
-
-        //PLAYER DRAW
-        void draw() {
-            DrawTriangle(playerShape.v1, playerShape.v2, playerShape.v3, YELLOW);
-        }
-
-        //PLAYER SHAPE UPDATE
-        void updateShape(Vector2 screenDim) {
-            Vector2 center = {screenDim.x / 2, screenDim.y / 2};
-
-            //PLAYER POSITION
-            playerShape.v1 = {center.x + velocity.x, center.y + velocity.y};
-            playerShape.v2 = {playerShape.v1.x - playerShape.offset, playerShape.v1.y + playerShape.offset + playerShape.height};
-            playerShape.v3 = {playerShape.v1.x + playerShape.offset, playerShape.v1.y + playerShape.offset + playerShape.height};
-            playerShape.center = {(playerShape.v1.x + playerShape.v2.x + playerShape.v3.x) / 3, (playerShape.v1.y + playerShape.v2.y + playerShape.v3.y) / 3};
-
-            playerShape.v1 = rotatePoint(playerShape.v1, playerShape.center, turnAngle);
-            playerShape.v2 = rotatePoint(playerShape.v2, playerShape.center, turnAngle);
-            playerShape.v3 = rotatePoint(playerShape.v3, playerShape.center, turnAngle);
-
-        }
-        
-        //PLAYER MOVEMENT
-        void playerMovement() {
-            Vector2 playerDirection = getDirection(turnAngle);
-
-            if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-                velocity.y += playerDirection.y * speed;
-                velocity.x += playerDirection.x * speed;
-            }
-            if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-                velocity.y -= playerDirection.y * speed;
-                velocity.x -= playerDirection.x * speed;
-            }
-            if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-                turnAngle -= angleSpeed;
-            }
-            if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-                turnAngle += angleSpeed;
-            }
-        }
-
-        //PLAYER HITBOX
-        void updateHitbox() {
-            float left = std::min(std::min(playerShape.v1.x, playerShape.v2.x), playerShape.v3.x);
-            float right = std::max(std::max(playerShape.v1.x, playerShape.v2.x), playerShape.v3.x);
-
-            float top = std::min(std::min(playerShape.v1.y, playerShape.v2.y), playerShape.v3.y);
-            float bottom = std::max(std::max(playerShape.v1.y, playerShape.v2.y), playerShape.v3.y);
-
-            hitbox = {left, top, right - left, bottom - top};
-        }
-
-        //PLAYER HITBOX DRAW
-        void drawHitbox() {
-            DrawRectangleLines(hitbox.x, hitbox.y, hitbox.width, hitbox.height, RAYWHITE);
-        }
-};
-
 int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "Raycasting Simulation");
@@ -212,14 +118,14 @@ int main() {
         map.update(screenDim);
 
         BeginDrawing();
-        ClearBackground(BLACK);
+            ClearBackground(BLACK);
 
-        map.draw(screenDim);
+            map.draw(screenDim);
 
-        player.draw();
-        player.drawHitbox();
+            player.draw();
+            player.drawHitbox();
 
-        DrawFPS(10, 10);
+            DrawFPS(10, 10);
         EndDrawing();
     }
     CloseWindow();
