@@ -1,5 +1,5 @@
 # Compiled executables
-.exe
+*.exe
 .out
 
 # Object Files
